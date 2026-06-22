@@ -1,4 +1,4 @@
-<?phphttps://github.com/prabesh05/SneakPeak
+<?php
 
 $conn = mysqli_connect('localhost', 'root', '', 'SneakPeak');
 
