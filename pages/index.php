@@ -348,7 +348,7 @@
     <div class="word-tagline">New Definition</div>
 
 <div class="cta-wrap">
-    <a href="product.php" class="cta">Shop Now</a>
+    <a href="products.php" class="cta">Shop Now</a>
 </div>
   </div>
 
