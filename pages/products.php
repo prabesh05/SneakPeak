@@ -772,12 +772,12 @@
     });
   });
 
-  /* ── Cart ─── 
+  /* ── Cart ─── */
   function addToCart(id) {
     cartCount++;
     document.querySelector('.cart-badge').textContent = cartCount;
 
-*/
+
 
 
     /* quick pulse feedback */
