@@ -587,7 +587,7 @@
       img: 'https://images.unsplash.com/photo-1603808033192-082d6919d3e1?w=600&q=80'
     },
     {
-      id: 14, brand: 'under armour',
+      id: 14, brand: 'under armour 2',
       name: 'UA SlipSpeed Mega',
       colorway: 'Pitch Gray / White',
       price: 120,
