@@ -516,7 +516,7 @@ $flash = isset($_GET['msg']) ? $_GET['msg'] : '';
     </div>
 
     <div class="form-row">
-      <label>Price ($)</label>
+      <label>Price (Rs)</label>
       <input type="number" name="price" step="0.01" min="0" required>
     </div>
 
@@ -631,7 +631,7 @@ $flash = isset($_GET['msg']) ? $_GET['msg'] : '';
 
           <div class="admin-controls">
             <form method="POST" action="adminProduct.php" class="price-form">
-              <span class="dollar">$</span>
+              <span class="rupees">Rs</span>
               <input type="hidden" name="action" value="update">
               <input type="hidden" name="id" value="${p.id}">
               <input type="number" name="price" step="0.01" min="0" class="price-input" value="${parseFloat(p.price)}">

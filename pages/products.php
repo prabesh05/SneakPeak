@@ -492,8 +492,13 @@ if ($result) {
   let activeBrand = 'all';
   let cartCount = 0;
 
+  function formatPrice(value) {
+    const number = Number(value);
+    return isNaN(number) ? value : `Rs.${number.toLocaleString('en-IN')}`;
+  }
+
   /* ── Render cards ─── */
-  function renderCards(list) {
+  function renderCards(list) {                                         
     const grid = document.getElementById('products-grid');
     const countLabel = document.getElementById('count-label');
     const sectionTitle = document.getElementById('section-title');
@@ -534,7 +539,7 @@ if ($result) {
           <p class="card-name">${p.name}</p>
           <p class="card-colorway">${p.colorway}</p>
           <div class="card-footer">
-            <span class="card-price">$${p.price}</span>
+            <span class="card-price">${formatPrice(p.price)}</span>
             <button class="card-add" onclick="addToCart(${p.id})" title="Add to cart">
               <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </button>
