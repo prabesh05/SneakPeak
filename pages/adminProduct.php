@@ -489,6 +489,17 @@ $flash = isset($_GET['msg']) ? $_GET['msg'] : '';
   <div class="flash error show">Image upload failed. Use a JPG, PNG, GIF, or WEBP under 5MB.</div>
 <?php } ?>
 
+<script>
+
+    setTimeout(function () {
+        const flash = document.querySelector('.flash');
+        if (flash) {
+            flash.style.display = 'none';
+        }
+    }, 5000); // 5000 milliseconds = 5 seconds
+
+  </script>
+
 <!-- ── Toolbar ─── -->
 <div class="toolbar">
   <span></span>
