@@ -1,3 +1,14 @@
+<?php
+include 'database.php'; // expects $conn to be a mysqli connection
+
+$products = array();
+$result = mysqli_query($conn, "SELECT * FROM products ORDER BY brand, id");
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $products[] = $row;
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +18,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,400;0,700;0,900;1,900&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 
     :root {
       --red:   #E8192C;
@@ -473,219 +485,8 @@
 </div>
 
 <script>
-  /* ── Product data ─── */
-  const products = [
-    /* NIKE */
-    {
-      id: 1, brand: 'nike',
-      name: 'Air Jordan 1 Retro High OG',
-      colorway: 'Chicago / Red & White',
-      price: 180,
-      badge: 'hot',
-      img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80'
-    },
-    {
-      id: 2, brand: 'nike',
-      name: 'Nike Dunk Low',
-      colorway: 'Panda / Black & White',
-      price: 110,
-      badge: null,
-      img: 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=600&q=80'
-    },
-    {
-      id: 3, brand: 'nike',
-      name: 'Air Force 1 \'07',
-      colorway: 'Triple White',
-      price: 90,
-      badge: null,
-      img: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&q=80'
-    },
-    {
-      id: 4, brand: 'nike',
-      name: 'Nike Air Max 90',
-      colorway: 'Infrared / White & Red',
-      price: 130,
-      badge: 'new',
-      img: 'https://images.unsplash.com/photo-1605348532760-6753d2c43329?w=600&q=80'
-    },
-
-    /* ADIDAS */
-    {
-      id: 5, brand: 'adidas',
-      name: 'Adidas Ultraboost 23',
-      colorway: 'Core Black / Cloud White',
-      price: 190,
-      badge: 'hot',
-      img: 'https://images.unsplash.com/photo-1539185441755-769473a23570?w=600&q=80'
-    },
-    {
-      id: 6, brand: 'adidas',
-      name: 'Adidas Stan Smith',
-      colorway: 'White / Green',
-      price: 100,
-      badge: null,
-      img: 'https://images.stockx.com/images/adidas-Stan-Smith-Footwear-White-Core-Black.jpg?fit=fill&bg=FFFFFF&w=480&h=320&q=60&dpr=1&trim=color&updated_at=1664882949'
-    },
-    {
-      id: 7, brand: 'adidas',
-      name: 'Adidas Samba OG',
-      colorway: 'Core Black / Gum',
-      price: 100,
-      badge: 'hot',
-      img: 'https://images.unsplash.com/photo-1584735175315-9d5df23be4be?w=600&q=80'
-    },
-    {
-      id: 8, brand: 'adidas',
-      name: 'Adidas Forum Low',
-      colorway: 'Cloud White / Collegiate Navy',
-      price: 90,
-      badge: 'new',
-      img: 'https://images.unsplash.com/photo-1620155176061-52b66f842a39?w=600&q=80'
-    },
-
-    /* NEW BALANCE */
-    {
-      id: 9, brand: 'new balance',
-      name: 'New Balance 550',
-      colorway: 'White / Green',
-      price: 110,
-      badge: 'hot',
-      img: 'https://images.unsplash.com/photo-1608231387042-66d1773d3028?w=600&q=80'
-    },
-    {
-      id: 10, brand: 'new balance',
-      name: 'New Balance 990v6',
-      colorway: 'Grey / Navy',
-      price: 185,
-      badge: null,
-      img: 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=600&q=80'
-    },
-    {
-      id: 11, brand: 'new balance',
-      name: 'New Balance 2002R',
-      colorway: 'Sea Salt / Beige',
-      price: 150,
-      badge: 'new',
-      img: 'https://images.unsplash.com/photo-1562183241-b937e95585b6?w=600&q=80'
-    },
-
-    /* UNDER ARMOUR */
-    {
-      id: 12, brand: 'under armour',
-      name: 'UA Curry 11',
-      colorway: 'Performance Blue',
-      price: 160,
-      badge: 'new',
-      img: 'https://images.unsplash.com/photo-1607522370275-f14206abe5d3?w=600&q=80'
-    },
-    {
-      id: 13, brand: 'under armour',
-      name: 'UA HOVR Phantom 3',
-      colorway: 'Black / Metallic Silver',
-      price: 140,
-      badge: null,
-      img: 'https://images.unsplash.com/photo-1603808033192-082d6919d3e1?w=600&q=80'
-    },
-    {
-      id: 14, brand: 'under armour',
-      name: 'UA SlipSpeed Mega',
-      colorway: 'Pitch Gray / White',
-      price: 120,
-      badge: 'sale',
-      img: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=600&q=80'
-    },
-
-    /* CONVERSE */
-    {
-      id: 15, brand: 'converse',
-      name: 'Chuck Taylor All Star Hi',
-      colorway: 'Classic Black',
-      price: 65,
-      badge: null,
-      img: 'https://images.unsplash.com/photo-1463100099107-aa0980c362e6?w=600&q=80'
-    },
-    {
-      id: 16, brand: 'converse',
-      name: 'Converse Run Star Hike',
-      colorway: 'White / Black / Gum',
-      price: 100,
-      badge: 'hot',
-      img: 'https://images.unsplash.com/photo-1518002171953-a080ee817e1f?w=600&q=80'
-    },
-    {
-      id: 17, brand: 'converse',
-      name: 'Chuck 70 High Top',
-      colorway: 'Vintage Canvas / White',
-      price: 85,
-      badge: 'new',
-      img: 'https://images.unsplash.com/photo-1445632283550-de097b87ad43?w=600&q=80'
-    },
-
-    /* CROCS */
-    {
-      id: 18, brand: 'crocs',
-      name: 'Classic Clog',
-      colorway: 'Neon Yellow',
-      price: 55,
-      badge: 'hot',
-      img: 'https://media.crocs.com/images/f_auto%2Cq_auto%2Cw_900%2Ch_900%2Cc_pad%2Cb_transparent/products/10001_3YF_ALT100/crocs.jpg'
-    },
-    
-    {
-      id: 20, brand: 'crocs',
-      name: 'Classic Mega Crush Clog',
-      colorway: 'Black',
-      price: 80,
-      badge: 'sale',
-      img: 'https://media.crocs.com/images/f_auto%2Cq_auto%2Cw_900%2Ch_900%2Cc_pad%2Cb_transparent/products/10001_5EP_ALT100/crocs.jpg'
-    },
-    {
-      id: 20, brand: 'crocs',
-      name: 'Echo Clog',
-      colorway: 'Black',
-      price: 80,
-      badge: null,
-      img: 'https://media.crocs.com/images/f_auto%2Cq_auto%2Cw_900%2Ch_900%2Cc_pad%2Cb_transparent/products/207937_001_ALT100/crocs.jpg'
-    },
-    
-
-    /* PUMA */
-    {
-      id: 21, brand: 'puma',
-      name: 'Puma Suede Classic XXI',
-      colorway: 'Black / Puma Team Gold',
-      price: 75,
-      badge: null,
-      img: 'https://images.unsplash.com/photo-1600181957967-7ff2f3fb4f19?w=600&q=80'
-    },
-    {
-      id: 22, brand: 'puma',
-      name: 'Puma RS-X',
-      colorway: 'White / Team Royal / Red',
-      price: 110,
-      badge: 'hot',
-      img: 'https://images.unsplash.com/photo-1511556532299-8f662fc26c06?w=600&q=80'
-    },
-
-    /* VANS */
-    {
-      id: 23, brand: 'vans',
-      name: 'Vans Old Skool',
-      colorway: 'Black / White',
-      price: 65,
-      badge: null,
-      img: 'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=600&q=80'
-    },
-    
-    {
-      id: 24, brand: 'vans',
-      name: 'Vans Sk8-Hi',
-      colorway: 'Classic White',
-      price: 80,
-      badge: 'new',
-      img: 'https://images.unsplash.com/photo-1609259510516-5aea81aeeedc?w=600&q=80'
-    }
-  ];
+  /* -- Product data (from database) -- */
+  const products = <?php echo json_encode($products); ?>;
 
   /* ── State ─── */
   let activeBrand = 'all';

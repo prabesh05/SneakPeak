@@ -1,51 +1,74 @@
 <?php
 session_start();
-include "database.php";
+include 'database.php';
 
-$error = "";
-
-if (isset($_POST['login'])) {
-
-    $username = mysqli_real_escape_string($conn, $_POST['username']);
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = $_POST['password'];
 
-    $sql = "SELECT * FROM register WHERE username = '$username'";
-    $result = mysqli_query($conn, $sql);
+    $query = "SELECT * FROM login WHERE email = '$email'";
+    $result = mysqli_query($conn, $query);
 
-    if (mysqli_num_rows($result) == 1) {
+    if (mysqli_num_rows($result) > 0) {
+        $user = mysqli_fetch_assoc($result);
 
-        $row = mysqli_fetch_assoc($result);
-        $hashed_password = $row['password'];
+        if (password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['email'] = $user['email'];
+            $_SESSION['role'] = $user['role'];
 
-        if (password_verify($password, $hashed_password)) {
-
-            $_SESSION['username'] = $username;
-            $_SESSION['email'] = $row['email'];
-
-            header("Location: products.php");
-            exit;
-
+            if ($user['role'] == "admin") {
+                header("Location: adminProduct.php");
+                exit;
+            } else {
+                header("Location: products.php");
+                exit;
+            }
         } else {
-            $error = "Incorrect password. Please try again.";
+            $error = "Incorrect password";
         }
-
     } else {
-        $error = "No account found with that username.";
+        $error = "No account found with that email";
     }
-
-    mysqli_close($conn);
 }
 ?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login - SneakPeak</title>
+    <title>Login</title>
+</head>
+<body>
 
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<div class="container">
+
+<h2>Login</h2>
+
+<?php if (isset($error)) { ?>
+    <p style="color:red;"><?php echo $error; ?></p>
+<?php } ?>
+
+<form method="POST">
+
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" required>
+
+    <button type="submit" name="login">Login</button>
+
+</form>
+
+<p>
+    Don't have an account?
+    <a href="register.php">Register here</a>
+</p>
+
+</div>
+
+</body>
+</html>
+
 
 <style>
 *{
@@ -196,37 +219,3 @@ a:hover{
     }
 }
 </style>
-
-</head>
-
-<body>
-
-<div class="container">
-
-    <h2>Login</h2>
-
-    <?php if (!empty($error)) { ?>
-        <div class="error"><?php echo $error; ?></div>
-    <?php } ?>
-
-    <form method="POST">
-
-        <label>Username</label>
-        <input type="text" name="username" required>
-
-        <label>Password</label>
-        <input type="password" name="password" required>
-
-        <button type="submit" name="login">Login</button>
-
-    </form>
-
-    <p>
-        Don't have an account?
-        <a href="register.php">Register here</a>
-    </p>
-
-</div>
-
-</body>
-</html>
