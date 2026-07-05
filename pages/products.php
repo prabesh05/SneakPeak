@@ -120,6 +120,53 @@ if ($result) {
       display: flex; align-items: center; justify-content: center;
     }
 
+    /* ── Search bar (in nav) ─── */
+    .nav-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(245,245,245,.06);
+      border: 1px solid rgba(245,245,245,.15);
+      border-radius: 50px;
+      padding: 8px 16px;
+      transition: border-color .2s, background .2s;
+    }
+    .nav-search:focus-within {
+      border-color: var(--red);
+      background: rgba(245,245,245,.1);
+    }
+
+    .nav-search input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      font-size: .9rem;
+      width: 140px;
+    }
+    .nav-search input::placeholder { color: var(--grey); }
+
+    .nav-search button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      padding: 0;
+    }
+    .nav-search button svg {
+      width: 17px; height: 17px;
+      stroke: var(--white);
+      fill: none;
+      stroke-width: 2;
+      transition: stroke .2s;
+    }
+    .nav-search button:hover svg { stroke: var(--red); }
+
+    @media (max-width: 700px) {
+      .nav-search input { width: 90px; }
+    }
+
     /* ── Page hero strip ─── */
     .page-hero {
       position: relative;
@@ -445,9 +492,15 @@ if ($result) {
   </a>
   <div class="nav-links">
     <a href="index.php">Home</a>
-    <a href="#" class="active">Shop</a>
-    <a href="about.php">About</a>
-    <a href="contact.php">Contact</a>
+    <a href="products.php" class="active">Shop</a>
+    <a href="#">About</a>
+    <a href="#">Contact</a>
+    <form class="nav-search" action="search.php" method="GET">
+      <input type="text" name="query" placeholder="Search sneakers..." required>
+      <button type="submit" aria-label="Search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+    </form>
     <a href="cart.php" class="nav-cart" title="View Cart">
       <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
       <span class="cart-badge">0</span>
@@ -596,5 +649,6 @@ if ($result) {
   /* ── Init ─── */
   filterProducts('all');
 </script>
+
 </body>
 </html>
