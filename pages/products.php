@@ -493,7 +493,7 @@ if ($result) {
   <div class="nav-links">
     <a href="index.php">Home</a>
     <a href="products.php" class="active">Shop</a>
-    <a href="#">About</a>
+    <a href="AboutUs.php">About</a>
     <a href="#">Contact</a>
     <form class="nav-search" action="search.php" method="GET">
       <input type="text" name="query" placeholder="Search sneakers..." required>

@@ -643,7 +643,7 @@
         <span class="about-eyebrow">Beyond Footwear</span>
         <h2>Style That Speaks You</h2>
         <p>
-          At <strong class="brand-sneak">Sneak</strong><strong>Peak</strong>, we don't just stop at footwear — we bring you a handpicked selection of stylish, comfortable clothing for every mood and moment. Whether you're dressing for a casual day out or a standout event, our collection blends trend and tradition to help you express your unique style.
+          At <strong class="brand-sneak">Sneak</strong><strong>Peak</strong>, we're passionate about authentic footwear. We bring you a carefully curated collection of genuine sneakers and shoes from trusted brands, ensuring quality, comfort, and style with every pair. Our mission is simple: to provide 100% authentic footwear at the best prices, so you can step out with confidence without overpaying.
         </p>
       </div>
       <div class="about-media">

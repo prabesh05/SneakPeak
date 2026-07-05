@@ -461,9 +461,9 @@ $flash = isset($_GET['msg']) ? $_GET['msg'] : '';
   </a>
   <div class="nav-links">
     <a href="index.php">Home</a>
-    <a href="products.php">Shop</a>
+    <a href="#">Shop</a>
     <a href="adminProduct.php" class="active">Admin</a>
-    <a href="about.php">About</a>
+    <a href="AboutUs.php">About</a>
     <a href="contact.php">Contact</a>
   </div>
 </nav>
