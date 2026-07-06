@@ -100,11 +100,14 @@ $conn->close();
     }
 
     .result-card {
+      display: block;
       background: linear-gradient(155deg, #1c1c1c 0%, #0d0d0d 70%);
       border: 1px solid rgba(245,245,245,.08);
       border-radius: 14px;
       overflow: hidden;
       transition: transform .2s, box-shadow .2s;
+      text-decoration: none;
+      color: inherit;
     }
     .result-card:hover {
       transform: translateY(-4px);
@@ -193,7 +196,7 @@ $conn->close();
     <?php if (count($results) > 0): ?>
       <div class="results-grid">
         <?php foreach ($results as $item): ?>
-          <div class="result-card">
+          <a href="product-detail.php?id=<?= $item['id'] ?>" class="result-card">
             <img src="<?= htmlspecialchars($item['img']) ?>" alt="<?= htmlspecialchars($item['name']) ?>">
             <div class="result-card-body">
               <p class="brand-label"><?= htmlspecialchars($item['brand']) ?></p>
@@ -201,7 +204,7 @@ $conn->close();
               <p class="colorway-label"><?= htmlspecialchars($item['colorway']) ?></p>
               <span class="price">Rs.<?= number_format((float)$item['price']) ?></span>
             </div>
-          </div>
+          </a>
         <?php endforeach; ?>
       </div>
     <?php else: ?>

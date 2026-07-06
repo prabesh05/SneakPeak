@@ -583,17 +583,17 @@ if ($result) {
         : '';
 
       card.innerHTML = `
-        <div class="card-img">
+        <div class="card-img" onclick="event.stopPropagation(); window.location.href='product-detail.php?id=${p.id}'">
           ${badgeHtml}
           <img src="${p.img}" alt="${p.name}" loading="lazy" />
         </div>
-        <div class="card-body">
+        <div class="card-body" onclick="event.stopPropagation(); window.location.href='product-detail.php?id=${p.id}'">
           <p class="card-brand">${p.brand}</p>
           <p class="card-name">${p.name}</p>
           <p class="card-colorway">${p.colorway}</p>
           <div class="card-footer">
             <span class="card-price">${formatPrice(p.price)}</span>
-            <button class="card-add" onclick="addToCart(${p.id})" title="Add to cart">
+            <button class="card-add" onclick="event.stopPropagation(); addToCart(${p.id})" title="Add to cart">
               <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </button>
           </div>
