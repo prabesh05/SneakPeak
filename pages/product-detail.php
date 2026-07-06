@@ -212,33 +212,31 @@ if (!$product) {
     /* ── Image panel ─── */
     .detail-img-panel {
       position: relative;
-      background: var(--card);
+      background: #f2f0f2;
       border: 1px solid var(--border);
       border-radius: 16px;
       overflow: hidden;
-      aspect-ratio: 1;
+      aspect-ratio: 4/3;
+      max-width: 460px;
+      margin: 0 auto;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 20px;
     }
 
     .detail-img-panel img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       transition: transform .5s;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 12px 18px rgba(0,0,0,.18));
     }
 
     .detail-img-panel:hover img {
       transform: scale(1.04);
-    }
-
-    .detail-img-panel::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 50%, rgba(232,25,44,.08), transparent 70%);
-      pointer-events: none;
     }
 
     .detail-badge {
@@ -475,18 +473,19 @@ if (!$product) {
 
     .related-card-img {
       position: relative;
-      background: #1c1c1c;
+      background: #f2f0f2;
       height: 180px;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      padding: 10px;
     }
 
     .related-card-img img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       transition: transform .4s;
     }
 
@@ -564,7 +563,7 @@ if (!$product) {
         gap: 40px;
         padding-top: 30px;
       }
-      .detail-img-panel { aspect-ratio: 4/3; }
+      .detail-img-panel { aspect-ratio: 4/3; max-width: 100%; }
       .detail-specs { grid-template-columns: 1fr; }
     }
 
