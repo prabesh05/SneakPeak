@@ -173,15 +173,6 @@ UPDATE login SET role = 'admin' WHERE email = 'user@email.com';
 - [ ] Wishlist feature
 - [ ] Product inventory tracking
 
-## 📞 Support
-
-For issues or questions, please open an issue on the GitHub repository.
-
-## 📄 License
-
-This project is open source and available under the MIT License.
-
----
 
 **Created by**: Prabesh  
 **Repository**: [prabesh05/SneakPeak](https://github.com/prabesh05/SneakPeak)
