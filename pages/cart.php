@@ -41,23 +41,102 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($errors)) {
             $orderItems  = cart_items_with_products($conn);
             $orderSub    = cart_subtotal($conn);
+            $orderId     = 'SP-' . strtoupper(substr(md5(uniqid('', true)), 0, 7));
+            $userId      = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
+            $createdAt   = date('Y-m-d H:i:s');
+            $status      = 'pending';
 
-            $_SESSION['last_order'] = [
-                'order_id'  => 'SP-' . strtoupper(substr(md5(uniqid('', true)), 0, 7)),
-                'name'      => $name,
-                'phone'     => $phone,
-                'address'   => $address,
-                'payment'   => $payment,
-                'items'     => $orderItems,
-                'subtotal'  => $orderSub,
-                'shipping'  => $shippingFee,
-                'total'     => $orderSub + $shippingFee,
-                'placed_at' => date('D, d M Y — h:i A'),
-            ];
+            $stmt = $conn->prepare("INSERT INTO cart (
+                order_id, user_id, product_id, product_name, size, quantity,
+                unit_price, line_total, customer_name, phone, address,
+                payment_method, subtotal, shipping_fee, total_amount, status, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-            cart_clear();
-            header('Location: cart.php?view=confirmation');
-            exit;
+            if (!$stmt) {
+                $errors[] = 'Unable to save your order right now.';
+            } else {
+                $saved = true;
+                foreach ($orderItems as $item) {
+                    $productId     = intval($item['id']);
+                    $productName   = $item['name'];
+                    $itemSize      = $item['size'];
+                    $itemQty       = intval($item['qty']);
+                    $unitPrice     = floatval($item['price']);
+                    $lineTotal     = floatval($item['lineTotal']);
+                    $customerName  = $name;
+                    $customerPhone = $phone;
+                    $customerAddr  = $address;
+                    $paymentMethod = $payment;
+                    $subtotalValue = floatval($orderSub);
+                    $shippingValue = floatval($shippingFee);
+                    $totalValue    = floatval($orderSub + $shippingFee);
+                    $orderStatus   = $status;
+                    $createdAtValue = $createdAt;
+
+                    if (!$stmt->bind_param(
+                        'siissiddssssdddss',
+                        $orderId,
+                        $userId,
+                        $productId,
+                        $productName,
+                        $itemSize,
+                        $itemQty,
+                        $unitPrice,
+                        $lineTotal,
+                        $customerName,
+                        $customerPhone,
+                        $customerAddr,
+                        $paymentMethod,
+                        $subtotalValue,
+                        $shippingValue,
+                        $totalValue,
+                        $orderStatus,
+                        $createdAtValue
+                    )) {
+                        $saved = false;
+                        break;
+                    }
+
+                    if (!$stmt->execute()) {
+                        $saved = false;
+                        break;
+                    }
+
+                    $stmt->close();
+                    $stmt = $conn->prepare("INSERT INTO cart (
+                        order_id, user_id, product_id, product_name, size, quantity,
+                        unit_price, line_total, customer_name, phone, address,
+                        payment_method, subtotal, shipping_fee, total_amount, status, created_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                }
+
+                if (isset($stmt) && is_object($stmt)) {
+                    $stmt->close();
+                }
+
+                if (!$saved) {
+                    $errors[] = 'Unable to save your order right now.';
+                }
+            }
+
+            if (empty($errors)) {
+                $_SESSION['last_order'] = [
+                    'order_id'  => $orderId,
+                    'name'      => $name,
+                    'phone'     => $phone,
+                    'address'   => $address,
+                    'payment'   => $payment,
+                    'items'     => $orderItems,
+                    'subtotal'  => $orderSub,
+                    'shipping'  => $shippingFee,
+                    'total'     => $orderSub + $shippingFee,
+                    'placed_at' => date('D, d M Y — h:i A'),
+                ];
+
+                cart_clear();
+                header('Location: cart.php?view=confirmation');
+                exit;
+            }
         }
     }
 }
