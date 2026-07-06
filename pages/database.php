@@ -1,8 +1,8 @@
 <?php
 
-$conn = mysqli_connect('localhost', 'root', '', 'SneakPeak');
+$conn = new mysqli('localhost', 'root', '', 'SneakPeak', 3307);
 
-if (!$conn) {
+if (!$conn) {   
     die("Connection failed: " . mysqli_connect_error());
 }
 ?>

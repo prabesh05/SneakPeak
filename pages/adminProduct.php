@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $maxSizeBytes = 5 * 1024 * 1024; // 5MB
 
             if (isset($_FILES['img_file']) && $_FILES['img_file']['error'] == 0) {
-                $uploadDir = __DIR__ . '/uploads/products/';
+                $uploadDir = dirname(__DIR__) . '/uploads/products/';
                 if (!is_dir($uploadDir)) {
                     mkdir($uploadDir, 0755, true);
                 }
@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $destination = $uploadDir . $newFileName;
 
                     if (move_uploaded_file($_FILES['img_file']['tmp_name'], $destination)) {
-                        $imgPath = 'uploads/products/' . $newFileName;
+                        $imgPath = '../uploads/products/' . $newFileName;
                     }
                 }
             }
