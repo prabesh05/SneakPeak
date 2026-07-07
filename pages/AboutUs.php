@@ -1,4 +1,9 @@
-<?php session_start(); ?>
+<?php session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -313,6 +318,69 @@
     outline:2px solid var(--accent);
     outline-offset:3px;
   }
+
+  /* ── User Dropdown (About theme) ─── */
+  .user-dropdown-about { position: relative; display: inline-block; }
+  .user-dropdown-toggle-about {
+    cursor: pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    background:var(--accent);
+    color:var(--bg);
+    font-size:.85rem;
+    font-weight:700;
+    text-decoration:none;
+    transition:background .2s;
+  }
+  .user-dropdown-toggle-about:hover { background:rgba(255,77,28,.8); }
+  .user-dropdown-menu-about {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: #1a1a1a;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 8px;
+    padding: 6px 0;
+    min-width: 170px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(4px);
+    transition: opacity .2s, visibility .2s, transform .2s;
+    z-index: 1000;
+    box-shadow: 0 8px 24px rgba(0,0,0,.5);
+  }
+  .user-dropdown-menu-about.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  .user-dropdown-email-about {
+    display: block;
+    padding: 8px 16px;
+    font-size: .82rem;
+    color: var(--muted);
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    white-space: nowrap;
+  }
+  .user-dropdown-menu-about a {
+    display: block;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--fg);
+    text-decoration: none;
+    transition: color .2s, background .2s;
+  }
+  .user-dropdown-menu-about a:hover {
+    color: var(--accent);
+    background: rgba(255,77,28,.08);
+  }
 </style>
 </head>
 <body>
@@ -326,7 +394,13 @@
         <li><a href="#values">What we check</a></li>
         <li><a href="#join">Shop</a></li>
       </ul>
-      <a class="nav-cta" href="#join">Shop now</a>
+      <div class="user-dropdown-about">
+        <span class="user-dropdown-toggle-about" id="userDropdownToggle"><?= strtoupper($_SESSION['email'][0]) ?></span>
+        <div class="user-dropdown-menu-about" id="userDropdownMenu">
+          <span class="user-dropdown-email-about"><?= htmlspecialchars($_SESSION['email']) ?></span>
+          <a href="logout.php">Logout</a>
+        </div>
+      </div>
     </nav>
   </div>
 </header>
@@ -422,5 +496,18 @@
   </div>
 </footer>
 
+<script>
+  /* ── User dropdown ─── */
+  document.addEventListener('click', function(e){
+    var toggle = document.getElementById('userDropdownToggle');
+    var menu = document.getElementById('userDropdownMenu');
+    if (!toggle || !menu) return;
+    if (toggle.contains(e.target)) {
+      menu.classList.toggle('show');
+    } else if (!menu.contains(e.target)) {
+      menu.classList.remove('show');
+    }
+  });
+</script>
 </body>
 </html>

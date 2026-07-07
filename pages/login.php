@@ -53,7 +53,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <input type="email" id="email" name="email" required>
 
     <label for="password">Password</label>
-    <input type="password" id="password" name="password" required>
+    <div class="password-wrap">
+        <input type="password" id="password" name="password" required>
+        <span class="toggle-pw" id="togglePw" tabindex="0">&#128065;</span>
+    </div>
 
     <button type="submit" name="login">Login</button>
 
@@ -66,6 +69,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 </div>
 
+<script>
+document.getElementById('togglePw').addEventListener('click', function(){
+    var pw = document.getElementById('password');
+    if (pw.type === 'password') { pw.type = 'text'; } else { pw.type = 'password'; }
+});
+</script>
 </body>
 </html>
 
@@ -148,6 +157,48 @@ label{
     display:block;
     margin-bottom:8px;
     font-weight:600;
+}
+
+/* password wrapper */
+.password-wrap{
+    position:relative;
+    width:100%;
+    margin-bottom:20px;
+}
+
+.password-wrap input{
+    width:100%;
+    padding:14px 44px 14px 14px;
+    border:none;
+    outline:none;
+    border-radius:10px;
+    background:#222;
+    color:var(--white);
+    font-size:16px;
+    transition:.3s;
+    margin-bottom:0;
+}
+
+.password-wrap input:focus{
+    border:2px solid var(--red);
+    box-shadow:0 0 15px rgba(232,25,44,.4);
+}
+
+.toggle-pw{
+    position:absolute;
+    right:14px;
+    top:50%;
+    transform:translateY(-50%);
+    cursor:pointer;
+    user-select:none;
+    font-size:18px;
+    line-height:1;
+    color:var(--grey);
+    transition:color .2s;
+}
+
+.toggle-pw:hover{
+    color:var(--white);
 }
 
 /* inputs */
