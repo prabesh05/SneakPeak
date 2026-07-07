@@ -1,8 +1,11 @@
 <?php
 include 'database.php';
+include 'cartHelper.php';
 
 $product = null;
 $relatedProducts = array();
+
+$sizes = ['UK 6', 'UK 7', 'UK 8', 'UK 9', 'UK 10', 'UK 11', 'UK 12'];
 
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     $id = intval($_GET['id']);
@@ -212,33 +215,31 @@ if (!$product) {
     /* ── Image panel ─── */
     .detail-img-panel {
       position: relative;
-      background: var(--card);
+      background: #f2f0f2;
       border: 1px solid var(--border);
       border-radius: 16px;
       overflow: hidden;
-      aspect-ratio: 1;
+      aspect-ratio: 4/3;
+      max-width: 460px;
+      margin: 0 auto;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 20px;
     }
 
     .detail-img-panel img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       transition: transform .5s;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 12px 18px rgba(0,0,0,.18));
     }
 
     .detail-img-panel:hover img {
       transform: scale(1.04);
-    }
-
-    .detail-img-panel::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 50%, rgba(232,25,44,.08), transparent 70%);
-      pointer-events: none;
     }
 
     .detail-badge {
@@ -308,6 +309,66 @@ if (!$product) {
       background: var(--red);
       opacity: 0;
       animation: fadeUp .4s .5s forwards;
+    }
+
+    /* ── Size selector ─── */
+    .size-select {
+      opacity: 0;
+      animation: fadeUp .4s .52s forwards;
+    }
+
+    .size-select-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: .8rem;
+      letter-spacing: .2em;
+      color: var(--grey);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .size-select-label .size-warning {
+      color: var(--red);
+      font-size: .75rem;
+      letter-spacing: .05em;
+      text-transform: none;
+      opacity: 0;
+      transition: opacity .2s;
+    }
+    .size-select-label .size-warning.show { opacity: 1; }
+
+    .size-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .size-option {
+      min-width: 56px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--white);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: .9rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s, color .2s;
+    }
+
+    .size-option:hover {
+      border-color: rgba(255,255,255,.3);
+    }
+
+    .size-option.selected {
+      background: var(--red);
+      border-color: var(--red);
+      color: var(--white);
     }
 
     .detail-specs {
@@ -590,18 +651,19 @@ if (!$product) {
 
     .related-card-img {
       position: relative;
-      background: #1c1c1c;
+      background: #f2f0f2;
       height: 180px;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      padding: 10px;
     }
 
     .related-card-img img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       transition: transform .4s;
     }
 
@@ -679,7 +741,7 @@ if (!$product) {
         gap: 40px;
         padding-top: 30px;
       }
-      .detail-img-panel { aspect-ratio: 4/3; }
+      .detail-img-panel { aspect-ratio: 4/3; max-width: 100%; }
       .detail-specs { grid-template-columns: 1fr; }
     }
 
@@ -710,7 +772,7 @@ if (!$product) {
     </form>
     <a href="cart.php" class="nav-cart" title="View Cart">
       <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-      <span class="cart-badge">0</span>
+      <span class="cart-badge"><?= cart_count() ?></span>
     </a>
   </div>
 </nav>
@@ -743,6 +805,18 @@ if (!$product) {
     <div class="detail-divider"></div>
 
     <p class="detail-price">Rs.<?= number_format($product['price'], 0) ?></p>
+
+    <div class="size-select">
+      <div class="size-select-label">
+        <span>Select Size</span>
+        <span class="size-warning" id="size-warning">Please select a size</span>
+      </div>
+      <div class="size-grid" id="size-grid">
+        <?php foreach ($sizes as $s): ?>
+          <div class="size-option" data-size="<?= htmlspecialchars($s) ?>"><?= htmlspecialchars($s) ?></div>
+        <?php endforeach; ?>
+      </div>
+    </div>
 
     <div class="detail-specs">
       <div class="spec-item">
@@ -817,7 +891,7 @@ if (!$product) {
     </div>
 
     <div class="detail-actions">
-      <button class="btn-add-cart" onclick="addToCart(<?= $product['id'] ?>)">
+      <button class="btn-add-cart" id="add-to-cart-btn" data-id="<?= $product['id'] ?>">
         <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
         Add to Cart
       </button>
@@ -857,21 +931,54 @@ if (!$product) {
 <div class="flash success" id="flash-msg">Added to cart!</div>
 
 <script>
-  let cartCount = 0;
+  let selectedSize = null;
 
-  function addToCart(id) {
-    cartCount++;
-    document.querySelector('.cart-badge').textContent = cartCount;
+  document.querySelectorAll('.size-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('.size-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      selectedSize = opt.dataset.size;
+      document.getElementById('size-warning').classList.remove('show');
+    });
+  });
 
-    const badge = document.querySelector('.cart-badge');
-    badge.style.transform = 'scale(1.5)';
-    badge.style.transition = 'transform .15s';
-    setTimeout(() => { badge.style.transform = 'scale(1)'; }, 150);
+  document.getElementById('add-to-cart-btn').addEventListener('click', () => {
+    if (!selectedSize) {
+      document.getElementById('size-warning').classList.add('show');
+      document.getElementById('size-grid').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
 
-    const flash = document.getElementById('flash-msg');
-    flash.classList.add('show');
-    setTimeout(() => { flash.classList.remove('show'); }, 2500);
-  }
+    const id = document.getElementById('add-to-cart-btn').dataset.id;
+    const formData = new URLSearchParams();
+    formData.set('id', id);
+    formData.set('size', selectedSize);
+    formData.set('qty', 1);
+
+    fetch('addToCart.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formData.toString()
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) {
+          alert(data.message || 'Could not add to cart.');
+          return;
+        }
+
+        const badge = document.querySelector('.cart-badge');
+        badge.textContent = data.cartCount;
+        badge.style.transform = 'scale(1.5)';
+        badge.style.transition = 'transform .15s';
+        setTimeout(() => { badge.style.transform = 'scale(1)'; }, 150);
+
+        const flash = document.getElementById('flash-msg');
+        flash.classList.add('show');
+        setTimeout(() => { flash.classList.remove('show'); }, 2500);
+      })
+      .catch(() => alert('Something went wrong adding this to your cart.'));
+  });
 
   function toggleSizeGuide() {
     const panel = document.getElementById('size-guide-panel');
