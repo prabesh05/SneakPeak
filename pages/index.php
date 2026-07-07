@@ -606,8 +606,8 @@
   <nav>
     <span class="nav-tagline">Unleash <span>The Beast</span></span>
     <div class="nav-links">
+      <a href="products.php">Shop</a>
       <?php if (isset($_SESSION['user_id'])): ?>
-        <a href="products.php">Shop</a>
         <span class="nav-user"><?= htmlspecialchars($_SESSION['email']) ?></span>
         <a href="logout.php" class="nav-logout">Logout</a>
       <?php else: ?>
@@ -639,7 +639,7 @@
     <div class="word-tagline">New Definition</div>
 
 <div class="cta-wrap">
-    <a href="login.php" class="cta">Shop Now</a>
+    <a href="products.php" class="cta">Shop Now</a>
 </div>
   </div>
 
