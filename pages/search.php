@@ -1,4 +1,5 @@
 <?php
+session_start();
 include 'database.php'; // expects $conn to be a mysqli connection
 
 $query = isset($_GET['query']) ? trim($_GET['query']) : '';
@@ -71,6 +72,26 @@ $conn->close();
       transition: color .2s;
     }
     .nav-links a:hover { color: var(--red); }
+
+    .nav-user {
+      font-family: 'Barlow', sans-serif;
+      font-size: .85rem;
+      color: rgba(255,255,255,.6);
+      margin-left: 32px;
+    }
+    .nav-logout, .nav-login {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .85rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.6);
+      text-decoration: none;
+      margin-left: 32px;
+      transition: color .2s;
+    }
+    .nav-logout:hover { color: var(--red); }
+    .nav-login:hover { color: var(--white); }
 
     main {
       max-width: 1000px;
@@ -180,8 +201,13 @@ $conn->close();
     <a href="index.php">Home</a>
     <a href="products.php">Shop</a>
     <a href="#">About</a>
-    <a href="#">Contact </a>
-    
+    <a href="#">Contact</a>
+    <?php if (isset($_SESSION['user_id'])): ?>
+      <span class="nav-user"><?= htmlspecialchars($_SESSION['email']) ?></span>
+      <a href="logout.php" class="nav-logout">Logout</a>
+    <?php else: ?>
+      <a href="login.php" class="nav-login">Login</a>
+    <?php endif; ?>
   </div>
 </nav>
 

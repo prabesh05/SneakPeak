@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -86,6 +87,23 @@
       transition: color .2s;
     }
     .nav-links a:hover { color: var(--red); }
+
+    .nav-user {
+      font-family: 'Barlow', sans-serif;
+      font-size: .85rem;
+      color: rgba(255,255,255,.6);
+    }
+    .nav-logout {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .85rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.6);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-logout:hover { color: var(--red); }
 
     /* ── Stage ───────────────────────────────────────────── */
     .stage {
@@ -588,8 +606,14 @@
   <nav>
     <span class="nav-tagline">Unleash <span>The Beast</span></span>
     <div class="nav-links">
-      <a href="login.php">Login</a>
-      <a href="register.php">Register</a>
+      <?php if (isset($_SESSION['user_id'])): ?>
+        <a href="products.php">Shop</a>
+        <span class="nav-user"><?= htmlspecialchars($_SESSION['email']) ?></span>
+        <a href="logout.php" class="nav-logout">Logout</a>
+      <?php else: ?>
+        <a href="login.php">Login</a>
+        <a href="register.php">Register</a>
+      <?php endif; ?>
     </div>
   </nav>
 

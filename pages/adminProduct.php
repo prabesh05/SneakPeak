@@ -1,5 +1,12 @@
 <?php
+session_start();
 include 'database.php'; // expects $conn to be a mysqli connection
+
+// ── Admin access control ───
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header("Location: login.php");
+    exit;
+}
 
 // ── Handle form actions (add / update price / delete) ───
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -177,6 +184,24 @@ $flash = isset($_GET['msg']) ? $_GET['msg'] : '';
       transition: color .2s;
     }
     .nav-links a:hover, .nav-links a.active { color: var(--white); }
+
+    .nav-user {
+      font-family: 'Barlow', sans-serif;
+      font-size: .85rem;
+      color: var(--grey);
+      white-space: nowrap;
+    }
+    .nav-logout {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .85rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--grey);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-logout:hover { color: var(--red); }
 
     /* ── Page hero strip ─── */
     .page-hero { position: relative; padding: 56px 60px 40px; overflow: hidden; }
@@ -465,6 +490,8 @@ $flash = isset($_GET['msg']) ? $_GET['msg'] : '';
     <a href="adminProduct.php" class="active">Admin</a>
     <a href="AboutUs.php">About</a>
     <a href="contact.php">Contact</a>
+    <span class="nav-user"><?= htmlspecialchars($_SESSION['email']) ?></span>
+    <a href="logout.php" class="nav-logout">Logout</a>
   </div>
 </nav>
 

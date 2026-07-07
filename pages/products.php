@@ -1,4 +1,5 @@
 <?php
+session_start();
 include 'database.php'; // expects $conn to be a mysqli connection
 
 $products = array();
@@ -89,6 +90,25 @@ if ($result) {
     }
     .nav-links a:hover,
     .nav-links a.active { color: var(--white); }
+
+    .nav-user {
+      font-family: 'Barlow', sans-serif;
+      font-size: .85rem;
+      color: var(--grey);
+      white-space: nowrap;
+    }
+    .nav-logout, .nav-login {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .85rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--grey);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-logout:hover { color: var(--red); }
+    .nav-login:hover { color: var(--white); }
 
     .nav-cart {
       position: relative;
@@ -505,6 +525,12 @@ if ($result) {
       <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
       <span class="cart-badge">0</span>
     </a>
+    <?php if (isset($_SESSION['user_id'])): ?>
+      <span class="nav-user"><?= htmlspecialchars($_SESSION['email']) ?></span>
+      <a href="logout.php" class="nav-logout">Logout</a>
+    <?php else: ?>
+      <a href="login.php" class="nav-login">Login</a>
+    <?php endif; ?>
   </div>
 </nav>
 
