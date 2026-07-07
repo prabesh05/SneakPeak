@@ -344,6 +344,121 @@ if (!$product) {
     }
 
     /* ── Actions ─── */
+    /* ── Size Guide ─── */
+    .size-guide-toggle {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 20px;
+      color: var(--grey);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .85rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      transition: color .2s, border-color .2s;
+      opacity: 0;
+      animation: fadeUp .4s .58s forwards;
+    }
+    .size-guide-toggle:hover {
+      color: var(--white);
+      border-color: rgba(255,255,255,.2);
+    }
+    .size-guide-toggle svg {
+      width: 18px; height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform .3s;
+    }
+    .size-guide-toggle.open svg {
+      transform: rotate(180deg);
+    }
+
+    .size-guide-panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .4s ease, opacity .3s ease, margin .3s ease;
+      opacity: 0;
+      margin-top: 0;
+    }
+    .size-guide-panel.open {
+      max-height: 500px;
+      opacity: 1;
+      margin-top: 12px;
+    }
+
+    .size-guide-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .size-guide-table th {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: .7rem;
+      letter-spacing: .15em;
+      color: var(--grey);
+      text-transform: uppercase;
+      padding: 10px 12px;
+      background: rgba(255,255,255,.04);
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    .size-guide-table td {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: .9rem;
+      color: var(--white);
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .size-guide-table tr:last-child td {
+      border-bottom: none;
+    }
+    .size-guide-table tr:hover td {
+      background: rgba(232,25,44,.08);
+    }
+
+    .size-guide-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+    .size-guide-tab {
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: .75rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--grey);
+      transition: all .2s;
+    }
+    .size-guide-tab.active {
+      background: var(--red);
+      color: var(--white);
+      border-color: var(--red);
+    }
+    .size-guide-tab:hover:not(.active) {
+      color: var(--white);
+      border-color: rgba(255,255,255,.2);
+    }
+
     .detail-actions {
       display: flex;
       gap: 16px;
@@ -648,6 +763,59 @@ if (!$product) {
       </div>
     </div>
 
+    <!-- ── Size Guide ─── -->
+    <button class="size-guide-toggle" onclick="toggleSizeGuide()">
+      <span>Size Guide (EU / US)</span>
+      <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="size-guide-panel" id="size-guide-panel">
+      <div class="size-guide-tabs">
+        <button class="size-guide-tab active" data-gender="men" onclick="switchSizeTab('men', this)">Men</button>
+        <button class="size-guide-tab" data-gender="women" onclick="switchSizeTab('women', this)">Women</button>
+      </div>
+      <table class="size-guide-table" id="size-table-men">
+        <thead>
+          <tr><th>EU</th><th>US</th><th>UK</th><th>CM</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>38</td><td>6</td><td>5</td><td>24</td></tr>
+          <tr><td>38.5</td><td>6.5</td><td>5.5</td><td>24.5</td></tr>
+          <tr><td>39</td><td>7</td><td>6</td><td>25</td></tr>
+          <tr><td>40</td><td>7.5</td><td>6.5</td><td>25.5</td></tr>
+          <tr><td>40.5</td><td>8</td><td>7</td><td>26</td></tr>
+          <tr><td>41</td><td>8.5</td><td>7.5</td><td>26.5</td></tr>
+          <tr><td>42</td><td>9</td><td>8</td><td>27</td></tr>
+          <tr><td>42.5</td><td>9.5</td><td>8.5</td><td>27.5</td></tr>
+          <tr><td>43</td><td>10</td><td>9</td><td>28</td></tr>
+          <tr><td>44</td><td>10.5</td><td>9.5</td><td>28.5</td></tr>
+          <tr><td>44.5</td><td>11</td><td>10</td><td>29</td></tr>
+          <tr><td>45</td><td>11.5</td><td>10.5</td><td>29.5</td></tr>
+          <tr><td>46</td><td>12</td><td>11</td><td>30</td></tr>
+          <tr><td>47</td><td>13</td><td>12</td><td>31</td></tr>
+          <tr><td>48</td><td>14</td><td>13</td><td>32</td></tr>
+        </tbody>
+      </table>
+      <table class="size-guide-table" id="size-table-women" style="display:none">
+        <thead>
+          <tr><th>EU</th><th>US</th><th>UK</th><th>CM</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>35</td><td>5</td><td>3</td><td>22</td></tr>
+          <tr><td>35.5</td><td>5.5</td><td>3.5</td><td>22.5</td></tr>
+          <tr><td>36</td><td>6</td><td>4</td><td>23</td></tr>
+          <tr><td>37</td><td>6.5</td><td>4.5</td><td>23.5</td></tr>
+          <tr><td>37.5</td><td>7</td><td>5</td><td>24</td></tr>
+          <tr><td>38</td><td>7.5</td><td>5.5</td><td>24.5</td></tr>
+          <tr><td>38.5</td><td>8</td><td>6</td><td>25</td></tr>
+          <tr><td>39</td><td>8.5</td><td>6.5</td><td>25.5</td></tr>
+          <tr><td>40</td><td>9</td><td>7</td><td>26</td></tr>
+          <tr><td>40.5</td><td>9.5</td><td>7.5</td><td>26.5</td></tr>
+          <tr><td>41</td><td>10</td><td>8</td><td>27</td></tr>
+          <tr><td>42</td><td>11</td><td>9</td><td>28</td></tr>
+        </tbody>
+      </table>
+    </div>
+
     <div class="detail-actions">
       <button class="btn-add-cart" onclick="addToCart(<?= $product['id'] ?>)">
         <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
@@ -703,6 +871,20 @@ if (!$product) {
     const flash = document.getElementById('flash-msg');
     flash.classList.add('show');
     setTimeout(() => { flash.classList.remove('show'); }, 2500);
+  }
+
+  function toggleSizeGuide() {
+    const panel = document.getElementById('size-guide-panel');
+    const toggle = document.querySelector('.size-guide-toggle');
+    panel.classList.toggle('open');
+    toggle.classList.toggle('open');
+  }
+
+  function switchSizeTab(gender, btn) {
+    document.querySelectorAll('.size-guide-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('size-table-men').style.display = gender === 'men' ? '' : 'none';
+    document.getElementById('size-table-women').style.display = gender === 'women' ? '' : 'none';
   }
 </script>
 
