@@ -5,7 +5,8 @@ include 'cartHelper.php';
 $product = null;
 $relatedProducts = array();
 
-$sizes = ['UK 6', 'UK 7', 'UK 8', 'UK 9', 'UK 10', 'UK 11', 'UK 12'];
+$eu_sizes = [38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48];
+$us_sizes = [6, 7, 8, 9, 10, 11, 12, 13, 14];
 
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     $id = intval($_GET['id']);
@@ -317,6 +318,22 @@ if (!$product) {
       animation: fadeUp .4s .52s forwards;
     }
 
+    .size-group {
+      margin-bottom: 14px;
+    }
+    .size-group:last-child {
+      margin-bottom: 0;
+    }
+    .size-group-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: .7rem;
+      letter-spacing: .2em;
+      color: var(--grey);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
     .size-select-label {
       display: flex;
       justify-content: space-between;
@@ -487,8 +504,13 @@ if (!$product) {
     .size-guide-table tr:last-child td {
       border-bottom: none;
     }
-    .size-guide-table tr:hover td {
-      background: rgba(232,25,44,.08);
+    .size-guide-table td.select-size {
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .size-guide-table td.select-size:hover {
+      background: rgba(232,25,44,.2);
+      color: var(--red);
     }
 
     .size-guide-tabs {
@@ -811,10 +833,21 @@ if (!$product) {
         <span>Select Size</span>
         <span class="size-warning" id="size-warning">Please select a size</span>
       </div>
-      <div class="size-grid" id="size-grid">
-        <?php foreach ($sizes as $s): ?>
-          <div class="size-option" data-size="<?= htmlspecialchars($s) ?>"><?= htmlspecialchars($s) ?></div>
-        <?php endforeach; ?>
+      <div class="size-group">
+        <div class="size-group-label">EU</div>
+        <div class="size-grid" id="size-grid-eu">
+          <?php foreach ($eu_sizes as $s): ?>
+            <div class="size-option" data-size="EU <?= $s ?>"><?= $s ?></div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+      <div class="size-group">
+        <div class="size-group-label">US</div>
+        <div class="size-grid" id="size-grid-us">
+          <?php foreach ($us_sizes as $s): ?>
+            <div class="size-option" data-size="US <?= $s ?>"><?= $s ?></div>
+          <?php endforeach; ?>
+        </div>
       </div>
     </div>
 
@@ -849,43 +882,43 @@ if (!$product) {
       </div>
       <table class="size-guide-table" id="size-table-men">
         <thead>
-          <tr><th>EU</th><th>US</th><th>UK</th><th>CM</th></tr>
+          <tr><th>EU</th><th>US</th><th>CM</th></tr>
         </thead>
         <tbody>
-          <tr><td>38</td><td>6</td><td>5</td><td>24</td></tr>
-          <tr><td>38.5</td><td>6.5</td><td>5.5</td><td>24.5</td></tr>
-          <tr><td>39</td><td>7</td><td>6</td><td>25</td></tr>
-          <tr><td>40</td><td>7.5</td><td>6.5</td><td>25.5</td></tr>
-          <tr><td>40.5</td><td>8</td><td>7</td><td>26</td></tr>
-          <tr><td>41</td><td>8.5</td><td>7.5</td><td>26.5</td></tr>
-          <tr><td>42</td><td>9</td><td>8</td><td>27</td></tr>
-          <tr><td>42.5</td><td>9.5</td><td>8.5</td><td>27.5</td></tr>
-          <tr><td>43</td><td>10</td><td>9</td><td>28</td></tr>
-          <tr><td>44</td><td>10.5</td><td>9.5</td><td>28.5</td></tr>
-          <tr><td>44.5</td><td>11</td><td>10</td><td>29</td></tr>
-          <tr><td>45</td><td>11.5</td><td>10.5</td><td>29.5</td></tr>
-          <tr><td>46</td><td>12</td><td>11</td><td>30</td></tr>
-          <tr><td>47</td><td>13</td><td>12</td><td>31</td></tr>
-          <tr><td>48</td><td>14</td><td>13</td><td>32</td></tr>
+          <tr><td class="select-size" data-size="EU 38">38</td><td class="select-size" data-size="US 6">6</td><td>24</td></tr>
+          <tr><td class="select-size" data-size="EU 38.5">38.5</td><td class="select-size" data-size="US 6.5">6.5</td><td>24.5</td></tr>
+          <tr><td class="select-size" data-size="EU 39">39</td><td class="select-size" data-size="US 7">7</td><td>25</td></tr>
+          <tr><td class="select-size" data-size="EU 40">40</td><td class="select-size" data-size="US 7.5">7.5</td><td>25.5</td></tr>
+          <tr><td class="select-size" data-size="EU 40.5">40.5</td><td class="select-size" data-size="US 8">8</td><td>26</td></tr>
+          <tr><td class="select-size" data-size="EU 41">41</td><td class="select-size" data-size="US 8.5">8.5</td><td>26.5</td></tr>
+          <tr><td class="select-size" data-size="EU 42">42</td><td class="select-size" data-size="US 9">9</td><td>27</td></tr>
+          <tr><td class="select-size" data-size="EU 42.5">42.5</td><td class="select-size" data-size="US 9.5">9.5</td><td>27.5</td></tr>
+          <tr><td class="select-size" data-size="EU 43">43</td><td class="select-size" data-size="US 10">10</td><td>28</td></tr>
+          <tr><td class="select-size" data-size="EU 44">44</td><td class="select-size" data-size="US 10.5">10.5</td><td>28.5</td></tr>
+          <tr><td class="select-size" data-size="EU 44.5">44.5</td><td class="select-size" data-size="US 11">11</td><td>29</td></tr>
+          <tr><td class="select-size" data-size="EU 45">45</td><td class="select-size" data-size="US 11.5">11.5</td><td>29.5</td></tr>
+          <tr><td class="select-size" data-size="EU 46">46</td><td class="select-size" data-size="US 12">12</td><td>30</td></tr>
+          <tr><td class="select-size" data-size="EU 47">47</td><td class="select-size" data-size="US 13">13</td><td>31</td></tr>
+          <tr><td class="select-size" data-size="EU 48">48</td><td class="select-size" data-size="US 14">14</td><td>32</td></tr>
         </tbody>
       </table>
       <table class="size-guide-table" id="size-table-women" style="display:none">
         <thead>
-          <tr><th>EU</th><th>US</th><th>UK</th><th>CM</th></tr>
+          <tr><th>EU</th><th>US</th><th>CM</th></tr>
         </thead>
         <tbody>
-          <tr><td>35</td><td>5</td><td>3</td><td>22</td></tr>
-          <tr><td>35.5</td><td>5.5</td><td>3.5</td><td>22.5</td></tr>
-          <tr><td>36</td><td>6</td><td>4</td><td>23</td></tr>
-          <tr><td>37</td><td>6.5</td><td>4.5</td><td>23.5</td></tr>
-          <tr><td>37.5</td><td>7</td><td>5</td><td>24</td></tr>
-          <tr><td>38</td><td>7.5</td><td>5.5</td><td>24.5</td></tr>
-          <tr><td>38.5</td><td>8</td><td>6</td><td>25</td></tr>
-          <tr><td>39</td><td>8.5</td><td>6.5</td><td>25.5</td></tr>
-          <tr><td>40</td><td>9</td><td>7</td><td>26</td></tr>
-          <tr><td>40.5</td><td>9.5</td><td>7.5</td><td>26.5</td></tr>
-          <tr><td>41</td><td>10</td><td>8</td><td>27</td></tr>
-          <tr><td>42</td><td>11</td><td>9</td><td>28</td></tr>
+          <tr><td class="select-size" data-size="EU 35">35</td><td class="select-size" data-size="US 5">5</td><td>22</td></tr>
+          <tr><td class="select-size" data-size="EU 35.5">35.5</td><td class="select-size" data-size="US 5.5">5.5</td><td>22.5</td></tr>
+          <tr><td class="select-size" data-size="EU 36">36</td><td class="select-size" data-size="US 6">6</td><td>23</td></tr>
+          <tr><td class="select-size" data-size="EU 37">37</td><td class="select-size" data-size="US 6.5">6.5</td><td>23.5</td></tr>
+          <tr><td class="select-size" data-size="EU 37.5">37.5</td><td class="select-size" data-size="US 7">7</td><td>24</td></tr>
+          <tr><td class="select-size" data-size="EU 38">38</td><td class="select-size" data-size="US 7.5">7.5</td><td>24.5</td></tr>
+          <tr><td class="select-size" data-size="EU 38.5">38.5</td><td class="select-size" data-size="US 8">8</td><td>25</td></tr>
+          <tr><td class="select-size" data-size="EU 39">39</td><td class="select-size" data-size="US 8.5">8.5</td><td>25.5</td></tr>
+          <tr><td class="select-size" data-size="EU 40">40</td><td class="select-size" data-size="US 9">9</td><td>26</td></tr>
+          <tr><td class="select-size" data-size="EU 40.5">40.5</td><td class="select-size" data-size="US 9.5">9.5</td><td>26.5</td></tr>
+          <tr><td class="select-size" data-size="EU 41">41</td><td class="select-size" data-size="US 10">10</td><td>27</td></tr>
+          <tr><td class="select-size" data-size="EU 42">42</td><td class="select-size" data-size="US 11">11</td><td>28</td></tr>
         </tbody>
       </table>
     </div>
@@ -945,7 +978,7 @@ if (!$product) {
   document.getElementById('add-to-cart-btn').addEventListener('click', () => {
     if (!selectedSize) {
       document.getElementById('size-warning').classList.add('show');
-      document.getElementById('size-grid').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.querySelector('.size-group').scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
 
@@ -993,6 +1026,19 @@ if (!$product) {
     document.getElementById('size-table-men').style.display = gender === 'men' ? '' : 'none';
     document.getElementById('size-table-women').style.display = gender === 'women' ? '' : 'none';
   }
+
+  document.querySelectorAll('.size-guide-table td.select-size').forEach(cell => {
+    cell.addEventListener('click', () => {
+      const size = cell.dataset.size;
+      const option = document.querySelector(`.size-option[data-size="${size}"]`);
+      if (!option) {
+        alert(`Size ${size} is not available for this product.`);
+        return;
+      }
+      option.click();
+      document.getElementById('add-to-cart-btn').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  });
 </script>
 
 </body>
