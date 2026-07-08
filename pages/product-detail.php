@@ -1,11 +1,18 @@
 <?php
+session_start();
 include 'database.php';
 include 'cartHelper.php';
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
 
 $product = null;
 $relatedProducts = array();
 
-$sizes = ['UK 6', 'UK 7', 'UK 8', 'UK 9', 'UK 10', 'UK 11', 'UK 12'];
+$eu_sizes = [38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48];
+$us_sizes = [6, 7, 8, 9, 10, 11, 12, 13, 14];
 
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     $id = intval($_GET['id']);
@@ -106,6 +113,71 @@ if (!$product) {
     }
     .nav-links a:hover,
     .nav-links a.active { color: var(--white); }
+
+    /* ── User Dropdown ─── */
+    .user-dropdown { position: relative; display: inline-block; }
+    .user-dropdown-toggle {
+      cursor: pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:36px;
+      height:36px;
+      border-radius:50%;
+      background:var(--red);
+      color:var(--white);
+      font-size:.85rem;
+      font-weight:700;
+      font-family: 'Barlow Condensed', sans-serif;
+      text-decoration: none;
+      transition: background .2s;
+    }
+    .user-dropdown-toggle:hover { background:rgba(232,25,44,.8); }
+    .user-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: #1a1a1a;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px;
+      padding: 6px 0;
+      min-width: 170px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(4px);
+      transition: opacity .2s, visibility .2s, transform .2s;
+      z-index: 1000;
+      box-shadow: 0 8px 24px rgba(0,0,0,.5);
+    }
+    .user-dropdown-menu.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .user-dropdown-email {
+      display: block;
+      padding: 8px 16px;
+      font-size: .82rem;
+      color: var(--grey);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      white-space: nowrap;
+    }
+    .user-dropdown-menu a {
+      display: block;
+      padding: 8px 16px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .9rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-decoration: none;
+      transition: color .2s, background .2s;
+    }
+    .user-dropdown-menu a:hover {
+      color: var(--red);
+      background: rgba(232,25,44,.08);
+    }
 
     .nav-cart {
       position: relative;
@@ -317,6 +389,22 @@ if (!$product) {
       animation: fadeUp .4s .52s forwards;
     }
 
+    .size-group {
+      margin-bottom: 14px;
+    }
+    .size-group:last-child {
+      margin-bottom: 0;
+    }
+    .size-group-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: .7rem;
+      letter-spacing: .2em;
+      color: var(--grey);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
     .size-select-label {
       display: flex;
       justify-content: space-between;
@@ -405,6 +493,126 @@ if (!$product) {
     }
 
     /* ── Actions ─── */
+    /* ── Size Guide ─── */
+    .size-guide-toggle {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 20px;
+      color: var(--grey);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .85rem;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      transition: color .2s, border-color .2s;
+      opacity: 0;
+      animation: fadeUp .4s .58s forwards;
+    }
+    .size-guide-toggle:hover {
+      color: var(--white);
+      border-color: rgba(255,255,255,.2);
+    }
+    .size-guide-toggle svg {
+      width: 18px; height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform .3s;
+    }
+    .size-guide-toggle.open svg {
+      transform: rotate(180deg);
+    }
+
+    .size-guide-panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .4s ease, opacity .3s ease, margin .3s ease;
+      opacity: 0;
+      margin-top: 0;
+    }
+    .size-guide-panel.open {
+      max-height: 500px;
+      opacity: 1;
+      margin-top: 12px;
+    }
+
+    .size-guide-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .size-guide-table th {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: .7rem;
+      letter-spacing: .15em;
+      color: var(--grey);
+      text-transform: uppercase;
+      padding: 10px 12px;
+      background: rgba(255,255,255,.04);
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    .size-guide-table td {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: .9rem;
+      color: var(--white);
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .size-guide-table tr:last-child td {
+      border-bottom: none;
+    }
+    .size-guide-table td.select-size {
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .size-guide-table td.select-size:hover {
+      background: rgba(232,25,44,.2);
+      color: var(--red);
+    }
+
+    .size-guide-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+    .size-guide-tab {
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: .75rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--grey);
+      transition: all .2s;
+    }
+    .size-guide-tab.active {
+      background: var(--red);
+      color: var(--white);
+      border-color: var(--red);
+    }
+    .size-guide-tab:hover:not(.active) {
+      color: var(--white);
+      border-color: rgba(255,255,255,.2);
+    }
+
     .detail-actions {
       display: flex;
       gap: 16px;
@@ -659,6 +867,13 @@ if (!$product) {
       <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
       <span class="cart-badge"><?= cart_count() ?></span>
     </a>
+    <div class="user-dropdown">
+      <span class="user-dropdown-toggle" id="userDropdownToggle"><?= strtoupper($_SESSION['email'][0]) ?></span>
+      <div class="user-dropdown-menu" id="userDropdownMenu">
+        <span class="user-dropdown-email"><?= htmlspecialchars($_SESSION['email']) ?></span>
+        <a href="logout.php">Logout</a>
+      </div>
+    </div>
   </div>
 </nav>
 
@@ -696,10 +911,21 @@ if (!$product) {
         <span>Select Size</span>
         <span class="size-warning" id="size-warning">Please select a size</span>
       </div>
-      <div class="size-grid" id="size-grid">
-        <?php foreach ($sizes as $s): ?>
-          <div class="size-option" data-size="<?= htmlspecialchars($s) ?>"><?= htmlspecialchars($s) ?></div>
-        <?php endforeach; ?>
+      <div class="size-group">
+        <div class="size-group-label">EU</div>
+        <div class="size-grid" id="size-grid-eu">
+          <?php foreach ($eu_sizes as $s): ?>
+            <div class="size-option" data-size="EU <?= $s ?>"><?= $s ?></div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+      <div class="size-group">
+        <div class="size-group-label">US</div>
+        <div class="size-grid" id="size-grid-us">
+          <?php foreach ($us_sizes as $s): ?>
+            <div class="size-option" data-size="US <?= $s ?>"><?= $s ?></div>
+          <?php endforeach; ?>
+        </div>
       </div>
     </div>
 
@@ -720,6 +946,59 @@ if (!$product) {
         <p class="spec-label">Status</p>
         <p class="spec-value"><?= $product['badge'] ? ucfirst(htmlspecialchars($product['badge'])) : 'Available' ?></p>
       </div>
+    </div>
+
+    <!-- ── Size Guide ─── -->
+    <button class="size-guide-toggle" onclick="toggleSizeGuide()">
+      <span>Size Guide (EU / US)</span>
+      <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="size-guide-panel" id="size-guide-panel">
+      <div class="size-guide-tabs">
+        <button class="size-guide-tab active" data-gender="men" onclick="switchSizeTab('men', this)">Men</button>
+        <button class="size-guide-tab" data-gender="women" onclick="switchSizeTab('women', this)">Women</button>
+      </div>
+      <table class="size-guide-table" id="size-table-men">
+        <thead>
+          <tr><th>EU</th><th>US</th><th>CM</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="select-size" data-size="EU 38">38</td><td class="select-size" data-size="US 6">6</td><td>24</td></tr>
+          <tr><td class="select-size" data-size="EU 38.5">38.5</td><td class="select-size" data-size="US 6.5">6.5</td><td>24.5</td></tr>
+          <tr><td class="select-size" data-size="EU 39">39</td><td class="select-size" data-size="US 7">7</td><td>25</td></tr>
+          <tr><td class="select-size" data-size="EU 40">40</td><td class="select-size" data-size="US 7.5">7.5</td><td>25.5</td></tr>
+          <tr><td class="select-size" data-size="EU 40.5">40.5</td><td class="select-size" data-size="US 8">8</td><td>26</td></tr>
+          <tr><td class="select-size" data-size="EU 41">41</td><td class="select-size" data-size="US 8.5">8.5</td><td>26.5</td></tr>
+          <tr><td class="select-size" data-size="EU 42">42</td><td class="select-size" data-size="US 9">9</td><td>27</td></tr>
+          <tr><td class="select-size" data-size="EU 42.5">42.5</td><td class="select-size" data-size="US 9.5">9.5</td><td>27.5</td></tr>
+          <tr><td class="select-size" data-size="EU 43">43</td><td class="select-size" data-size="US 10">10</td><td>28</td></tr>
+          <tr><td class="select-size" data-size="EU 44">44</td><td class="select-size" data-size="US 10.5">10.5</td><td>28.5</td></tr>
+          <tr><td class="select-size" data-size="EU 44.5">44.5</td><td class="select-size" data-size="US 11">11</td><td>29</td></tr>
+          <tr><td class="select-size" data-size="EU 45">45</td><td class="select-size" data-size="US 11.5">11.5</td><td>29.5</td></tr>
+          <tr><td class="select-size" data-size="EU 46">46</td><td class="select-size" data-size="US 12">12</td><td>30</td></tr>
+          <tr><td class="select-size" data-size="EU 47">47</td><td class="select-size" data-size="US 13">13</td><td>31</td></tr>
+          <tr><td class="select-size" data-size="EU 48">48</td><td class="select-size" data-size="US 14">14</td><td>32</td></tr>
+        </tbody>
+      </table>
+      <table class="size-guide-table" id="size-table-women" style="display:none">
+        <thead>
+          <tr><th>EU</th><th>US</th><th>CM</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="select-size" data-size="EU 35">35</td><td class="select-size" data-size="US 5">5</td><td>22</td></tr>
+          <tr><td class="select-size" data-size="EU 35.5">35.5</td><td class="select-size" data-size="US 5.5">5.5</td><td>22.5</td></tr>
+          <tr><td class="select-size" data-size="EU 36">36</td><td class="select-size" data-size="US 6">6</td><td>23</td></tr>
+          <tr><td class="select-size" data-size="EU 37">37</td><td class="select-size" data-size="US 6.5">6.5</td><td>23.5</td></tr>
+          <tr><td class="select-size" data-size="EU 37.5">37.5</td><td class="select-size" data-size="US 7">7</td><td>24</td></tr>
+          <tr><td class="select-size" data-size="EU 38">38</td><td class="select-size" data-size="US 7.5">7.5</td><td>24.5</td></tr>
+          <tr><td class="select-size" data-size="EU 38.5">38.5</td><td class="select-size" data-size="US 8">8</td><td>25</td></tr>
+          <tr><td class="select-size" data-size="EU 39">39</td><td class="select-size" data-size="US 8.5">8.5</td><td>25.5</td></tr>
+          <tr><td class="select-size" data-size="EU 40">40</td><td class="select-size" data-size="US 9">9</td><td>26</td></tr>
+          <tr><td class="select-size" data-size="EU 40.5">40.5</td><td class="select-size" data-size="US 9.5">9.5</td><td>26.5</td></tr>
+          <tr><td class="select-size" data-size="EU 41">41</td><td class="select-size" data-size="US 10">10</td><td>27</td></tr>
+          <tr><td class="select-size" data-size="EU 42">42</td><td class="select-size" data-size="US 11">11</td><td>28</td></tr>
+        </tbody>
+      </table>
     </div>
 
     <div class="detail-actions">
@@ -777,7 +1056,7 @@ if (!$product) {
   document.getElementById('add-to-cart-btn').addEventListener('click', () => {
     if (!selectedSize) {
       document.getElementById('size-warning').classList.add('show');
-      document.getElementById('size-grid').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.querySelector('.size-group').scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
 
@@ -810,6 +1089,45 @@ if (!$product) {
         setTimeout(() => { flash.classList.remove('show'); }, 2500);
       })
       .catch(() => alert('Something went wrong adding this to your cart.'));
+  });
+
+  function toggleSizeGuide() {
+    const panel = document.getElementById('size-guide-panel');
+    const toggle = document.querySelector('.size-guide-toggle');
+    panel.classList.toggle('open');
+    toggle.classList.toggle('open');
+  }
+
+  function switchSizeTab(gender, btn) {
+    document.querySelectorAll('.size-guide-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('size-table-men').style.display = gender === 'men' ? '' : 'none';
+    document.getElementById('size-table-women').style.display = gender === 'women' ? '' : 'none';
+  }
+
+  document.querySelectorAll('.size-guide-table td.select-size').forEach(cell => {
+    cell.addEventListener('click', () => {
+      const size = cell.dataset.size;
+      const option = document.querySelector(`.size-option[data-size="${size}"]`);
+      if (!option) {
+        alert(`Size ${size} is not available for this product.`);
+        return;
+      }
+      option.click();
+      document.getElementById('add-to-cart-btn').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  });
+
+  /* ── User dropdown ─── */
+  document.addEventListener('click', function(e){
+    var toggle = document.getElementById('userDropdownToggle');
+    var menu = document.getElementById('userDropdownMenu');
+    if (!toggle || !menu) return;
+    if (toggle.contains(e.target)) {
+      menu.classList.toggle('show');
+    } else if (!menu.contains(e.target)) {
+      menu.classList.remove('show');
+    }
   });
 </script>
 

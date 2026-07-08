@@ -3,8 +3,8 @@ session_start();
 include 'database.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = $_POST['password'];
+    $email = $_SESSION['email'];
 
     $query = "SELECT * FROM login WHERE email = '$email'";
     $result = mysqli_query($conn, $query);
@@ -13,35 +13,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $user = mysqli_fetch_assoc($result);
 
         if (password_verify($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['email'] = $user['email'];
-            $_SESSION['role'] = $user['role'];
-
-            if ($user['role'] == "admin") {
-                header("Location: adminProduct.php");
-                exit;
-            } else {
-                header("Location: products.php");
-                exit;
-            }
+            session_destroy();
+            header("Location: index.php");
+            exit;
         } else {
             $error = "Incorrect password";
         }
     } else {
-        $error = "No account found with that email";
+        $error = "User not found";
     }
 }
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login</title>
+    <title>Confirm Logout</title>
 </head>
 <body>
 
 <div class="container">
 
-<h2>Login</h2>
+<h2>Logout</h2>
+
+<p style="margin-bottom:20px;">Enter your password to confirm logout.</p>
 
 <?php if (isset($error)) { ?>
     <p style="color:red;"><?php echo $error; ?></p>
@@ -49,22 +43,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <form method="POST">
 
-    <label for="email">Email</label>
-    <input type="email" id="email" name="email" required>
-
     <label for="password">Password</label>
     <div class="password-wrap">
         <input type="password" id="password" name="password" required>
         <span class="toggle-pw" id="togglePw" tabindex="0">&#128065;</span>
     </div>
 
-    <button type="submit" name="login">Login</button>
+    <button type="submit" name="logout">Confirm Logout</button>
 
 </form>
 
 <p>
-    Don't have an account?
-    <a href="register.php">Register here</a>
+    <a href="javascript:history.back()">Cancel</a>
 </p>
 
 </div>

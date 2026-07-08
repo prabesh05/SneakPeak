@@ -1,5 +1,12 @@
 <?php
+session_start();
 include 'database.php'; // expects $conn to be a mysqli connection
+
+// ── Admin access control ───
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header("Location: login.php");
+    exit;
+}
 
 // ── Handle form actions (add / update price / delete) ───
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -177,6 +184,71 @@ $flash = isset($_GET['msg']) ? $_GET['msg'] : '';
       transition: color .2s;
     }
     .nav-links a:hover, .nav-links a.active { color: var(--white); }
+
+    /* ── User Dropdown ─── */
+    .user-dropdown { position: relative; display: inline-block; }
+    .user-dropdown-toggle {
+      cursor: pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:36px;
+      height:36px;
+      border-radius:50%;
+      background:var(--red);
+      color:var(--white);
+      font-size:.85rem;
+      font-weight:700;
+      font-family: 'Barlow Condensed', sans-serif;
+      text-decoration: none;
+      transition: background .2s;
+    }
+    .user-dropdown-toggle:hover { background:rgba(232,25,44,.8); }
+    .user-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: #1a1a1a;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px;
+      padding: 6px 0;
+      min-width: 170px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(4px);
+      transition: opacity .2s, visibility .2s, transform .2s;
+      z-index: 1000;
+      box-shadow: 0 8px 24px rgba(0,0,0,.5);
+    }
+    .user-dropdown-menu.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .user-dropdown-email {
+      display: block;
+      padding: 8px 16px;
+      font-size: .82rem;
+      color: var(--grey);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      white-space: nowrap;
+    }
+    .user-dropdown-menu a {
+      display: block;
+      padding: 8px 16px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .9rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-decoration: none;
+      transition: color .2s, background .2s;
+    }
+    .user-dropdown-menu a:hover {
+      color: var(--red);
+      background: rgba(232,25,44,.08);
+    }
 
     /* ── Page hero strip ─── */
     .page-hero { position: relative; padding: 56px 60px 40px; overflow: hidden; }
@@ -465,6 +537,13 @@ $flash = isset($_GET['msg']) ? $_GET['msg'] : '';
     <a href="adminProduct.php" class="active">Admin</a>
     <a href="AboutUs.php">About</a>
     <a href="contact.php">Contact</a>
+    <div class="user-dropdown">
+      <span class="user-dropdown-toggle" id="userDropdownToggle"><?= strtoupper($_SESSION['email'][0]) ?></span>
+      <div class="user-dropdown-menu" id="userDropdownMenu">
+        <span class="user-dropdown-email"><?= htmlspecialchars($_SESSION['email']) ?></span>
+        <a href="logout.php">Logout</a>
+      </div>
+    </div>
   </div>
 </nav>
 
@@ -684,6 +763,18 @@ $flash = isset($_GET['msg']) ? $_GET['msg'] : '';
 
   /* ── Init ─── */
   filterProducts('all');
+
+  /* ── User dropdown ─── */
+  document.addEventListener('click', function(e){
+    var toggle = document.getElementById('userDropdownToggle');
+    var menu = document.getElementById('userDropdownMenu');
+    if (!toggle || !menu) return;
+    if (toggle.contains(e.target)) {
+      menu.classList.toggle('show');
+    } else if (!menu.contains(e.target)) {
+      menu.classList.remove('show');
+    }
+  });
 </script>
 </body>
 </html>
