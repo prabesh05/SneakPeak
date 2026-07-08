@@ -50,7 +50,3 @@ CREATE TABLE cart (
     status VARCHAR(30) NOT NULL DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
-
-
-
