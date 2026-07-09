@@ -71,10 +71,49 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         else if ($action == 'update') {
-            $id    = mysqli_real_escape_string($conn, $_POST['id']);
-            $price = mysqli_real_escape_string($conn, $_POST['price']);
+            $id       = mysqli_real_escape_string($conn, $_POST['id']);
+            $brand    = mysqli_real_escape_string($conn, $_POST['brand']);
+            $name     = mysqli_real_escape_string($conn, $_POST['name']);
+            $colorway = mysqli_real_escape_string($conn, $_POST['colorway']);
+            $price    = mysqli_real_escape_string($conn, $_POST['price']);
 
-            $sql = "UPDATE products SET price = '$price' WHERE id = '$id'";
+            $badgeInput = $_POST['badge'];
+            if ($badgeInput == '') {
+                $badge = 'NULL';
+            } else {
+                $badge = "'" . mysqli_real_escape_string($conn, $badgeInput) . "'";
+            }
+
+            // ── Handle optional replacement image ───
+            $imgSetClause = '';
+            $allowedExt   = array('jpg', 'jpeg', 'png', 'gif', 'webp');
+            $maxSizeBytes = 5 * 1024 * 1024; // 5MB
+
+            if (isset($_FILES['img_file']) && $_FILES['img_file']['error'] == 0) {
+                $uploadDir = dirname(__DIR__) . '/uploads/products/';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0755, true);
+                }
+
+                $originalName = $_FILES['img_file']['name'];
+                $fileSize     = $_FILES['img_file']['size'];
+                $ext          = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+
+                if (in_array($ext, $allowedExt) && $fileSize <= $maxSizeBytes) {
+                    $newFileName = uniqid('shoe_') . '.' . $ext;
+                    $destination = $uploadDir . $newFileName;
+
+                    if (move_uploaded_file($_FILES['img_file']['tmp_name'], $destination)) {
+                        $imgPath = '../uploads/products/' . $newFileName;
+                        $img = mysqli_real_escape_string($conn, $imgPath);
+                        $imgSetClause = ", img = '$img'";
+                    }
+                }
+            }
+
+            $sql = "UPDATE products
+                    SET brand = '$brand', name = '$name', colorway = '$colorway', price = '$price', badge = $badge $imgSetClause
+                    WHERE id = '$id'";
 
             if (mysqli_query($conn, $sql)) {
                 header("Location: adminProduct.php?msg=updated");
@@ -507,6 +546,68 @@ $flash = isset($_GET['msg']) ? $_GET['msg'] : '';
     }
     .btn-delete:hover { background: var(--red); color: var(--white); }
 
+    .admin-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .admin-price {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: .03em;
+      color: var(--white);
+    }
+    .btn-edit { flex-shrink: 0; }
+
+    /* ── Edit modal ─── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.65);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: cardIn .25s ease forwards;
+    }
+    .modal h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: .06em;
+      margin-bottom: 20px;
+    }
+    .modal .current-img-preview {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+    .modal .current-img-preview img {
+      width: 64px; height: 64px; object-fit: cover;
+      border-radius: 6px; border: 1px solid var(--border);
+      background: #101010;
+    }
+    .modal .current-img-preview span {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .78rem; letter-spacing: .08em;
+      color: var(--grey); text-transform: uppercase;
+    }
+
     /* ── No results ─── */
     .no-results { grid-column: 1 / -1; text-align: center; padding: 80px 20px; display: none; }
     .no-results h3 { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--grey); letter-spacing: .1em; }
@@ -559,7 +660,7 @@ $flash = isset($_GET['msg']) ? $_GET['msg'] : '';
 <?php if ($flash == 'added') { ?>
   <div class="flash success show">Sneaker added successfully.</div>
 <?php } else if ($flash == 'updated') { ?>
-  <div class="flash success show">Price updated successfully.</div>
+  <div class="flash success show">Sneaker updated successfully.</div>
 <?php } else if ($flash == 'deleted') { ?>
   <div class="flash success show">Sneaker deleted.</div>
 <?php } else if ($flash == 'error') { ?>
@@ -642,6 +743,71 @@ $flash = isset($_GET['msg']) ? $_GET['msg'] : '';
   </form>
 </div>
 
+<!-- ── Edit product modal ─── -->
+<div class="modal-overlay" id="editModalOverlay" onclick="if(event.target === this) closeEditModal();">
+  <div class="modal">
+    <h3>Edit Sneaker</h3>
+    <form method="POST" action="adminProduct.php" class="add-form" enctype="multipart/form-data" id="editForm">
+      <input type="hidden" name="action" value="update">
+      <input type="hidden" name="id" id="edit-id">
+
+      <div class="form-row">
+        <label>Brand</label>
+        <select name="brand" id="edit-brand" required>
+          <option value="nike">Nike</option>
+          <option value="adidas">Adidas</option>
+          <option value="new balance">New Balance</option>
+          <option value="under armour">Under Armour</option>
+          <option value="converse">Converse</option>
+          <option value="crocs">Crocs</option>
+          <option value="puma">Puma</option>
+          <option value="vans">Vans</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <label>Price (Rs)</label>
+        <input type="number" name="price" id="edit-price" step="0.01" min="0" required>
+      </div>
+
+      <div class="form-row full">
+        <label>Name</label>
+        <input type="text" name="name" id="edit-name" required>
+      </div>
+
+      <div class="form-row full">
+        <label>Colorway</label>
+        <input type="text" name="colorway" id="edit-colorway">
+      </div>
+
+      <div class="form-row">
+        <label>Badge</label>
+        <select name="badge" id="edit-badge">
+          <option value="">None</option>
+          <option value="hot">Hot</option>
+          <option value="new">New</option>
+          <option value="sale">Sale</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <label>Replace Image (optional)</label>
+        <input type="file" name="img_file" accept=".jpg,.jpeg,.png,.gif,.webp">
+      </div>
+
+      <div class="current-img-preview">
+        <img id="edit-current-img" src="" alt="Current image">
+        <span>Current image &mdash; leave file blank to keep it</span>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-save-new">Save Changes</button>
+        <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- ── Brand filter bar ─── -->
 <div class="brand-bar">
   <button class="brand-btn active" data-brand="all">All</button>
@@ -720,13 +886,10 @@ $flash = isset($_GET['msg']) ? $_GET['msg'] : '';
           <p class="card-colorway">${p.colorway ? p.colorway : ''}</p>
 
           <div class="admin-controls">
-            <form method="POST" action="adminProduct.php" class="price-form">
-              <span class="rupees">Rs</span>
-              <input type="hidden" name="action" value="update">
-              <input type="hidden" name="id" value="${p.id}">
-              <input type="number" name="price" step="0.01" min="0" class="price-input" value="${parseFloat(p.price)}">
-              <button type="submit" class="btn-update">Save</button>
-            </form>
+            <div class="admin-row">
+              <span class="admin-price">Rs ${parseFloat(p.price).toLocaleString()}</span>
+              <button type="button" class="btn-update btn-edit">Edit</button>
+            </div>
             <form method="POST" action="adminProduct.php" class="delete-form"
                   onsubmit="return confirm('Delete ${p.name.replace(/'/g, "\\'")}? This cannot be undone.');">
               <input type="hidden" name="action" value="delete">
@@ -736,8 +899,32 @@ $flash = isset($_GET['msg']) ? $_GET['msg'] : '';
           </div>
         </div>`;
 
+      // Wire up the Edit button with a closure over this product's data,
+      // so we don't have to serialize it into inline HTML attributes.
+      card.querySelector('.btn-edit').addEventListener('click', () => openEditModal(p));
+
       grid.appendChild(card);
     });
+  }
+
+  /* ── Edit modal ─── */
+  function openEditModal(p) {
+    document.getElementById('edit-id').value = p.id;
+    document.getElementById('edit-brand').value = p.brand;
+    document.getElementById('edit-price').value = parseFloat(p.price);
+    document.getElementById('edit-name').value = p.name;
+    document.getElementById('edit-colorway').value = p.colorway || '';
+    document.getElementById('edit-badge').value = p.badge || '';
+
+    const preview = document.getElementById('edit-current-img');
+    preview.src = p.img ? p.img : '';
+
+    document.getElementById('editModalOverlay').classList.add('show');
+  }
+
+  function closeEditModal() {
+    document.getElementById('editModalOverlay').classList.remove('show');
+    document.getElementById('editForm').reset();
   }
 
   /* ── Filter logic ─── */

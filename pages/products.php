@@ -580,7 +580,7 @@ if ($result) {
       <span class="user-dropdown-toggle" id="userDropdownToggle"><?= strtoupper($_SESSION['email'][0]) ?></span>
       <div class="user-dropdown-menu" id="userDropdownMenu">
         <span class="user-dropdown-email"><?= htmlspecialchars($_SESSION['email']) ?></span>
-        <a href="logout.php">Logout</a>
+        <a href="login.php">Logout</a>
       </div>
     </div>
   </div>

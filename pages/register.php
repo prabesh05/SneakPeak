@@ -73,9 +73,13 @@ if (isset($_POST['register'])) {
 :root{
     --red:#E8192C;
     --black:#111111;
+    --card:#161616;
     --white:#F5F5F5;
-    --grey:#999;
+    --grey:#8a8a8a;
+    --line:rgba(255,255,255,.08);
 }
+
+html,body{ height:100%; }
 
 body{
     font-family:'Barlow',sans-serif;
@@ -89,109 +93,200 @@ body{
     position:relative;
 }
 
-/* Background Glow */
+/* grain texture, matches the admin panel */
 body::before{
     content:"";
-    position:absolute;
-    width:500px;
-    height:500px;
-    background:radial-gradient(circle, rgba(232,25,44,.25), transparent 70%);
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
+    position:fixed;
+    inset:0;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity:.035;
+    pointer-events:none;
     z-index:0;
 }
 
-/* Registration Card */
+/* diagonal glow beam instead of a centered blur blob */
+body::after{
+    content:"";
+    position:fixed;
+    width:900px;
+    height:280px;
+    background:linear-gradient(100deg, rgba(232,25,44,.22), transparent 65%);
+    top:-60px;
+    right:-200px;
+    transform:rotate(18deg);
+    z-index:0;
+    pointer-events:none;
+}
+
+/* container */
 .container{
     position:relative;
     z-index:1;
     width:400px;
-    background:rgba(255,255,255,.05);
-    border:1px solid rgba(255,255,255,.08);
-    backdrop-filter:blur(15px);
-    padding:40px;
-    border-radius:20px;
-    box-shadow:0 15px 40px rgba(0,0,0,.5);
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:5px solid var(--red);
+    padding:46px 42px 40px;
+    border-radius:4px;
+    box-shadow:0 25px 60px rgba(0,0,0,.55);
 }
 
+/* torn corner tag, pure decoration, no markup change needed */
+.container::before{
+
+    position:absolute;
+    top:0;
+    right:0;
+    background:var(--red);
+    color:var(--black);
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:800;
+    font-size:11px;
+    letter-spacing:.2em;
+    padding:5px 14px 5px 18px;
+    clip-path:polygon(14px 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* title */
 h2{
-    text-align:center;
     font-family:'Bebas Neue',sans-serif;
-    font-size:48px;
-    color:var(--red);
-    letter-spacing:2px;
-    margin-bottom:25px;
+    font-size:46px;
+    letter-spacing:.03em;
+    color:var(--white);
+    margin-bottom:6px;
+    line-height:.95;
 }
 
-label{
+h2::after{
+    content:"";
     display:block;
-    margin-bottom:8px;
+    width:56px;
+    height:4px;
+    background:var(--red);
+    margin-top:14px;
+    margin-bottom:24px;
+}
+
+/* error message */
+.error{
+    background:rgba(232,25,44,.1);
+    border:1px solid rgba(232,25,44,.35);
+    color:#ff5a5a;
+    padding:11px 14px;
+    margin-bottom:18px;
+    border-radius:4px;
+    font-size:14px;
     font-weight:600;
 }
 
+/* labels */
+label{
+    display:block;
+    margin-bottom:8px;
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:700;
+    font-size:12px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--grey);
+}
+
+/* underline-style inputs, no boxes */
 input{
     width:100%;
-    padding:14px;
-    margin-bottom:20px;
+    padding:12px 4px;
+    margin-bottom:24px;
     border:none;
+    border-bottom:2px solid var(--line);
     outline:none;
-    border-radius:10px;
-    background:#222;
+    border-radius:0;
+    background:transparent;
     color:var(--white);
     font-size:16px;
-    transition:.3s;
+    transition:border-color .25s, box-shadow .25s;
 }
+
+input::placeholder{ color:#555; }
 
 input:focus{
-    border:2px solid var(--red);
-    box-shadow:0 0 15px rgba(232,25,44,.4);
+    border-bottom-color:var(--red);
+    box-shadow:0 6px 14px -8px rgba(232,25,44,.6);
 }
 
+/* password wrapper reuses the same underline treatment */
+.password-wrap{
+    position:relative;
+    width:100%;
+    margin-bottom:0;
+}
+
+.password-wrap input{
+    padding-right:38px;
+    margin-bottom:24px;
+}
+
+.toggle-pw{
+    position:absolute;
+    right:4px;
+    top:14px;
+    cursor:pointer;
+    user-select:none;
+    font-size:17px;
+    line-height:1;
+    color:var(--grey);
+    transition:color .2s;
+}
+
+.toggle-pw:hover{ color:var(--white); }
+
+/* button, sharp with a clipped corner like a shoebox label */
 button{
     width:100%;
-    padding:15px;
-    border:none;
-    border-radius:50px;
+    padding:16px;
+    margin-top:6px;
+    border:2px solid var(--red);
+    border-radius:4px;
     background:var(--red);
-    color:white;
+    color:var(--black);
     font-family:'Barlow Condensed',sans-serif;
-    font-size:18px;
-    font-weight:700;
-    letter-spacing:2px;
+    font-size:16px;
+    font-weight:800;
+    letter-spacing:.18em;
+    text-transform:uppercase;
     cursor:pointer;
-    transition:.3s;
+    clip-path:polygon(0 0, calc(100% - 16px) 0, 100% 100%, 0 100%);
+    transition:background .25s, color .25s, transform .2s;
 }
 
 button:hover{
-    transform:translateY(-3px);
-    box-shadow:0 10px 30px rgba(232,25,44,.5);
+    background:transparent;
+    color:var(--red);
+    transform:translateY(-2px);
 }
 
+/* bottom text */
 p{
     text-align:center;
-    margin-top:20px;
+    margin-top:26px;
     color:var(--grey);
+    font-size:14px;
 }
 
 a{
     color:var(--red);
     text-decoration:none;
-    font-weight:600;
+    font-weight:700;
 }
 
-a:hover{
-    text-decoration:underline;
-}
+a:hover{ text-decoration:underline; }
 
+/* mobile */
 @media(max-width:480px){
     .container{
         width:90%;
-        padding:30px;
+        padding:34px 26px;
     }
 
-    h2{
-        font-size:40px;
-    }
+    h2{ font-size:38px; }
 }
 </style>
