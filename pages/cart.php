@@ -36,12 +36,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name    = trim($_POST['full_name'] ?? '');
         $phone   = trim($_POST['phone'] ?? '');
         $address = trim($_POST['address'] ?? '');
-        $payment = $_POST['payment_method'] ?? '';
+        $payment = ($_POST['payment_method'] ?? 'cod');
+        if ($payment !== 'cod') $payment = 'cod';
 
         if ($name === '') $errors[] = 'Full name is required.';
         if (!preg_match('/^[0-9+\-\s]{7,15}$/', $phone)) $errors[] = 'Enter a valid phone number.';
         if ($address === '') $errors[] = 'Delivery address is required.';
-        if (!in_array($payment, ['esewa', 'mobile_banking', 'cod'], true)) $errors[] = 'Please select a payment method.';
         if (cart_is_empty()) $errors[] = 'Your cart is empty.';
 
         if (empty($errors)) {
@@ -172,9 +172,7 @@ $total     = $subtotal + $shipping;
 $order = $_SESSION['last_order'] ?? null;
 
 $paymentLabels = [
-    'esewa'          => 'eSewa',
-    'mobile_banking' => 'Mobile Banking',
-    'cod'            => 'Cash on Delivery',
+    'cod' => 'Cash on Delivery',
 ];
 ?>
 <!DOCTYPE html>
@@ -670,7 +668,7 @@ $paymentLabels = [
 
     .payment-options {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: 1fr;
       gap: 14px;
     }
 
@@ -953,29 +951,7 @@ $paymentLabels = [
           <div class="payment-options">
 
             <label class="payment-card">
-              <input type="radio" name="payment_method" value="esewa" <?= (($_POST['payment_method'] ?? '') === 'esewa') ? 'checked' : '' ?>>
-              <div class="payment-card-body">
-                <div class="payment-logo payment-logo-esewa">
-                  <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="16" cy="14.5" r="1.4" fill="currentColor" stroke="none"/></svg>
-                </div>
-                <span class="payment-name">eSewa</span>
-                <span class="payment-sub">Digital wallet</span>
-              </div>
-            </label>
-
-            <label class="payment-card">
-              <input type="radio" name="payment_method" value="mobile_banking" <?= (($_POST['payment_method'] ?? '') === 'mobile_banking') ? 'checked' : '' ?>>
-              <div class="payment-card-body">
-                <div class="payment-logo payment-logo-banking">
-                  <svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M4 21V9l8-6 8 6v12"/><path d="M9 21v-6h6v6"/></svg>
-                </div>
-                <span class="payment-name">Mobile Banking</span>
-                <span class="payment-sub">Bank app transfer</span>
-              </div>
-            </label>
-
-            <label class="payment-card">
-              <input type="radio" name="payment_method" value="cod" <?= (($_POST['payment_method'] ?? '') === 'cod') ? 'checked' : '' ?>>
+              <input type="radio" name="payment_method" value="cod" checked>
               <div class="payment-card-body">
                 <div class="payment-logo payment-logo-cod">
                   <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="12" rx="2"/><circle cx="12" cy="13" r="3"/></svg>
