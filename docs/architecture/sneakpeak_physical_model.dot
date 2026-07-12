@@ -1,0 +1,47 @@
+digraph SneakPeakPhysicalModel {
+  rankdir=LR;
+  bgcolor="#ffffff";
+
+  node [shape=rect, style="rounded,filled", fillcolor="#f5f5f5", color="#444444", fontname="Helvetica"];
+  edge [fontname="Helvetica", color="#333333"];
+
+  subgraph cluster_clients {
+    label="Clients";
+    style=rounded;
+    browser [label="Web Browser\n(User or Admin)", shape=rect, fillcolor="#e8f0ff"];
+  }
+
+  subgraph cluster_web {
+    label="Web Server / App (Apache or Nginx + PHP)";
+    style=rounded;
+    web [label="PHP 7.4+\n/pages/*.php (index, products, cart, search, login, register, adminProduct, product-detail)\ncartHelper.php, addToCart.php, database.php\nServes HTML/CSS/JS, handles sessions, business logic"];
+  }
+
+  subgraph cluster_db {
+    label="Database Server (MySQL 5.7+)";
+    style=rounded;
+    db [label="SneakPeak Database\nTables: login, products, cart\nSchema: Database/SneakPeak_db.sql", shape=component, fillcolor="#fff0e0"];
+  }
+
+  subgraph cluster_storage {
+    label="File Storage";
+    style=rounded;
+    images [label="/images/ (product images)", shape=folder, fillcolor="#f0fff4"];
+    sqlfile [label="Database/SneakPeak_db.sql", shape=note, fillcolor="#fff7e6"];
+  }
+
+  sessions [label="PHP Sessions\n(session files on server)", shape=note, fillcolor="#f7f7ff"];
+
+  browser -> web [label="HTTP/HTTPS (requests: index, products, search, cart, login, register, admin)"];
+  web -> db [label="MySQL (mysqli or PDO)\nQueries: select/insert/update products, login, cart"];
+  web -> images [label="Reads product images, serves to client"];
+  web -> sessions [label="Start/Read/Write session data\n(cart badge, user auth)"];
+  web -> sqlfile [label="Init / schema import (one-time)\nDatabase/SneakPeak_db.sql"];
+
+  admin_ui [label="Admin Panel\npages/adminProduct.php", shape=rect, fillcolor="#fff0f6"];
+  browser -> admin_ui [label="Admin actions (add/edit products)"];
+  admin_ui -> web [label="Admin requests handled by PHP pages"];
+
+  // layout helpers
+  { rank=same; web; db; }
+}
